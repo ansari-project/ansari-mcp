@@ -1,5 +1,6 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
+import { askAnsari } from './ansariService';
 
 const server = new FastMCP({
   name: "Ansari",
@@ -33,16 +34,6 @@ server.addTool({
     return response;
   },
 });
-
-
-async function askAnsari(question: string): Promise<string> {
-    try {
-        return "Answer from Ansari.";
-    } catch (error) {
-        console.error("Ansari API error:", error);
-        return "Failed to fetch answer from Ansari API.";
-    }
-}
 
 // Start the server with stdio transport for MCP clients
 server.start({
