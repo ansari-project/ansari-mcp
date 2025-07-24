@@ -1,16 +1,19 @@
 import axios from 'axios';
 
-export async function askAnsari(question: string): Promise<string> {
+export async function askAnsari(question: string, log?): Promise<string> {
     try {
-        const response = await axios.post(`https://api.ansari.chat/api/v2/ayah`, {
-            "surah": 0,
-            "ayah": 0,
-            "question": question,
-            "augment_question": false,
-            "use_cache": true,
-            "apikey": "string"
-        });
-        return response.data?.response?.output ?? "No answer from Ansari.";
+        const data = {
+            "messages": [
+                {
+                    "role": "user", 
+                    "content": question
+                }
+            ]
+        }
+        const response = await axios.post(`https://api.ansari.chat/api/v1/complete`, data);
+        log.info("response", response.status)
+        //log.info("response", response.data)
+        return response.data ?? "No answer from Ansari.";
     } catch (error) {
         console.error("Ansari API error:", error);
         return "Failed to fetch answer from Ansari API.";

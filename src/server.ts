@@ -25,7 +25,7 @@ server.addTool({
     // Report initial progress
     await reportProgress({ progress: 0, total: 100 });
 
-    const response = await askAnsari(args.question);
+    const response = await askAnsari(args.question, log);
 
     // Report completion
     await reportProgress({ progress: 100, total: 100 });
