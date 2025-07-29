@@ -11,6 +11,7 @@ server.addTool({
   annotations: {
     openWorldHint: true, // This tool interact with external systems
     readOnlyHint: true, // This tool doesn't modify anything
+    //streamingHint: true, // Signals this tool uses streaming
     title: "Answer Islamic Question",
   },
   name: "answer_islamic_question",
@@ -20,22 +21,29 @@ server.addTool({
   }),
   execute: async (args, { log, reportProgress }) => {
 
+    console.log("Question: ", args.question)
     log.info("Question: ", args.question);
 
     // Report initial progress
     await reportProgress({ progress: 0, total: 100 });
 
-    const response = await askAnsari(args.question, log);
+    const response = await askAnsari(args.question);
 
     // Report completion
     await reportProgress({ progress: 100, total: 100 });
 
     log.info("Ansari :", response);
+    console.log("Recieved response from Ansari")
     return response;
   },
 });
 
-// Start the server with stdio transport for MCP clients
+
+// Start the server using httpstream transport
 server.start({
-  transportType: "stdio",
+  transportType: "httpStream",
+  httpStream: {
+    port: 8089,
+    endpoint: "/mcp"
+  },
 });

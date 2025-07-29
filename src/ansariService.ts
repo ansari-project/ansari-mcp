@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export async function askAnsari(question: string, log?): Promise<string> {
+export async function askAnsari(question: string): Promise<string> {
     try {
         const data = {
             "messages": [
@@ -11,8 +11,6 @@ export async function askAnsari(question: string, log?): Promise<string> {
             ]
         }
         const response = await axios.post(`https://api.ansari.chat/api/v1/complete`, data);
-        log.info("response", response.status)
-        //log.info("response", response.data)
         return response.data ?? "No answer from Ansari.";
     } catch (error) {
         console.error("Ansari API error:", error);
