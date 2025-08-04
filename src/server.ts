@@ -1,6 +1,6 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
-import { askAnsari } from './ansariService';
+import { askAnsari } from './ansari-service.js';
 
 const server = new FastMCP({
   name: "Ansari",
