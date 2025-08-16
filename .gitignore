@@ -3,3 +3,5 @@ node_modules
 /dist
 .cursor
 .vscode
+tmp/
+.claude-code.json
