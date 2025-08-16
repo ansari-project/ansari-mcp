@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "ansari": {
+      "url": "http://localhost:8089/mcp"
+    }
+  }
+}

@@ -7,14 +7,14 @@ const args = process.argv.slice(2);
 const isHttpMode = args.includes('--http') || args.includes('-h');
 
 // Parse API URL from command line
+let apiUrl = DEFAULT_ANSARI_API_URL;
 const apiUrlIndex = args.findIndex(arg => arg === '--api-url' || arg === '-u');
-const apiUrl = (apiUrlIndex !== -1 && args[apiUrlIndex + 1])
-  ? args[apiUrlIndex + 1]
-  : DEFAULT_ANSARI_API_URL;
-
-// Only log in HTTP mode to avoid breaking stdio protocol
-if (isHttpMode && apiUrlIndex !== -1 && args[apiUrlIndex + 1]) {
-  console.log(`Using Ansari API URL: ${apiUrl}`);
+if (apiUrlIndex !== -1 && args[apiUrlIndex + 1]) {
+  apiUrl = args[apiUrlIndex + 1];
+  // Only log in HTTP mode to avoid breaking stdio protocol
+  if (isHttpMode) {
+    console.log(`Using Ansari API URL: ${apiUrl}`);
+  }
 }
 
 const server = new FastMCP({
