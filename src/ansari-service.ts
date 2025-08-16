@@ -31,9 +31,12 @@ export async function askAnsari(question: string, apiUrl: string = DEFAULT_ANSAR
         } else {
             return "No answer from Ansari.";
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Don't log errors to console in stdio mode - it breaks MCP protocol
         // Errors will be returned as part of the response
-        return `Failed to fetch answer from Ansari API: ${error.message}`;
+        const errorMsg = (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string')
+            ? error.message
+            : String(error);
+        return `Failed to fetch answer from Ansari API: ${errorMsg}`;
     }
 }
