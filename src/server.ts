@@ -1,6 +1,21 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
-import { askAnsari } from './ansari-service.js';
+import { askAnsari, DEFAULT_ANSARI_API_URL } from './ansari-service.js';
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const isHttpMode = args.includes('--http') || args.includes('-h');
+
+// Parse API URL from command line
+let apiUrl = DEFAULT_ANSARI_API_URL;
+const apiUrlIndex = args.findIndex(arg => arg === '--api-url' || arg === '-u');
+if (apiUrlIndex !== -1 && args[apiUrlIndex + 1]) {
+  apiUrl = args[apiUrlIndex + 1];
+  // Only log in HTTP mode to avoid breaking stdio protocol
+  if (isHttpMode) {
+    console.log(`Using Ansari API URL: ${apiUrl}`);
+  }
+}
 
 const server = new FastMCP({
   name: "Ansari",
@@ -20,30 +35,33 @@ server.addTool({
     question: z.string().describe("The islamic question")
   }),
   execute: async (args, { log, reportProgress }) => {
-
-    console.log("Question: ", args.question)
     log.info("Question: ", args.question);
 
     // Report initial progress
     await reportProgress({ progress: 0, total: 100 });
 
-    const response = await askAnsari(args.question);
+    const response = await askAnsari(args.question, apiUrl);
 
     // Report completion
     await reportProgress({ progress: 100, total: 100 });
 
     log.info("Ansari :", response);
-    console.log("Recieved response from Ansari")
     return response;
   },
 });
 
 
-// Start the server using httpstream transport
-server.start({
-  transportType: "httpStream",
-  httpStream: {
-    port: 8089,
-    endpoint: "/mcp"
-  },
-});
+// Start the server in the appropriate mode
+if (isHttpMode) {
+  console.log("Starting Ansari MCP server in HTTP mode on http://localhost:8089/mcp");
+  server.start({
+    transportType: "httpStream",
+    httpStream: {
+      port: 8089,
+      endpoint: "/mcp"
+    },
+  });
+} else {
+  // stdio mode for Claude Desktop
+  server.start();
+}

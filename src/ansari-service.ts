@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-export async function askAnsari(question: string): Promise<string> {
+// Default API URL - can be overridden via command line
+export const DEFAULT_ANSARI_API_URL = 'https://staging-api.ansari.chat/api/v2/mcp-complete';
+
+export async function askAnsari(question: string, apiUrl: string = DEFAULT_ANSARI_API_URL): Promise<string> {
     try {
         const data = {
             "messages": [
@@ -10,20 +13,27 @@ export async function askAnsari(question: string): Promise<string> {
                 }
             ]
         }
-        const response = await axios.post(`https://api.ansari.chat/api/v1/complete`, data);
-        return response.data ?? "No answer from Ansari.";
-    } catch (error) {
-        console.error("Ansari API error:", error);
-        return "Failed to fetch answer from Ansari API.";
-    }
-}
-
-
-async function askAnsari2(question: string): Promise<string> {
-    try {
-        return "Answer from Ansari.";
-    } catch (error) {
-        console.error("Ansari API error:", error);
-        return "Failed to fetch answer from Ansari API.";
+        // Don't log to console in stdio mode - it breaks MCP protocol
+        const response = await axios.post(apiUrl, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout: 30000, // 30 second timeout
+        });
+        
+        // The API returns a string directly
+        if (typeof response.data === 'string') {
+            return response.data;
+        } else if (response.data) {
+            // Fallback for other response formats
+            return JSON.stringify(response.data);
+        } else {
+            return "No answer from Ansari.";
+        }
+    } catch (error: any) {
+        // Don't log errors to console in stdio mode - it breaks MCP protocol
+        // Errors will be returned as part of the response
+        return `Failed to fetch answer from Ansari API: ${error.message}`;
     }
 }

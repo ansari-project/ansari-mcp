@@ -6,6 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
+    "start:http": "node dist/server.js --http",
+    "start:stdio": "node dist/server.js",
     "dev": "npx fastmcp dev src/server.ts",
     "inspect": "npx fastmcp inspect src/server.ts",
     "test-direct": "tsx src/server.ts"
