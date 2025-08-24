@@ -92,47 +92,21 @@ async function handleJsonRpcMessage(message) {
 }
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  // Set comprehensive CORS headers
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Expose-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.status(204).end();
     return;
   }
 
   try {
-    // Check Accept header to determine if SSE is requested
-    const acceptHeader = req.headers.accept || '';
-    const isSSE = acceptHeader.includes('text/event-stream');
-    
-    // For GET requests with SSE accept header, handle as SSE
-    if (req.method === 'GET' && isSSE) {
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no');
-      
-      // Send initial SSE connection message
-      res.write(':ok\n\n');
-      
-      // Keep the connection alive
-      const keepAliveInterval = setInterval(() => {
-        res.write(':keepalive\n\n');
-      }, 30000);
-      
-      // Handle connection close
-      req.on('close', () => {
-        clearInterval(keepAliveInterval);
-      });
-      
-      return;
-    }
-    
-    // For regular GET requests, return server info
+    // For GET requests, return server info
     if (req.method === 'GET') {
       res.status(200).json({
         name: "Ansari",
@@ -143,23 +117,18 @@ export default async function handler(req, res) {
       return;
     }
 
-    // For POST requests with SSE, handle the message and respond via SSE
-    if (req.method === 'POST' && isSSE) {
-      const message = req.body;
-      const response = await handleJsonRpcMessage(message);
-      
-      // Send SSE response
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.write(`data: ${JSON.stringify(response)}\n\n`);
-      res.end();
-      return;
-    }
-
-    // For regular POST requests, handle MCP protocol messages
+    // For POST requests, handle MCP protocol messages
     if (req.method === 'POST') {
       const message = req.body;
+      
+      // Log the incoming request for debugging
+      console.log('Received MCP request:', JSON.stringify(message));
+      
       const response = await handleJsonRpcMessage(message);
+      
+      // Log the outgoing response for debugging
+      console.log('Sending MCP response:', JSON.stringify(response));
+      
       res.status(200).json(response);
       return;
     }
