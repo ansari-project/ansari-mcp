@@ -4,5 +4,8 @@
       "src": "/mcp",
       "dest": "/api/mcp"
     }
-  ]
+  ],
+  "deploymentProtection": {
+    "passwordProtection": false
+  }
 }
