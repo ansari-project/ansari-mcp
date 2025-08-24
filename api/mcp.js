@@ -10,14 +10,21 @@ async function handleJsonRpcMessage(message) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: {
-          tools: {},
-          logging: {}
+          tools: {}
+          // Removed logging capability since we don't need it for this simple server
         },
         serverInfo: {
           name: 'Ansari',
           version: '1.0.0'
         }
       }
+    };
+  } else if (message.method === 'logging/setLevel') {
+    // Handle logging level changes
+    return {
+      jsonrpc: '2.0',
+      id: message.id,
+      result: {}
     };
   } else if (message.method === 'tools/list') {
     return {
