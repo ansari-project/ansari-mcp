@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { askAnsari, DEFAULT_ANSARI_API_URL } from '../../dist/ansari-service.js'
+import { askAnsari, DEFAULT_ANSARI_API_URL } from '../../src/ansari-service'
 
 // Types for MCP protocol
 interface JsonRpcMessage {
