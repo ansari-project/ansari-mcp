@@ -195,7 +195,8 @@ export default async function handler(
         name: "Ansari",
         version: "1.0.0",
         status: "ready",
-        endpoint: "/mcp"
+        endpoint: "/mcp",
+        lastUpdated: "2025-08-24T09:45:00Z"
       })
       return
     }
