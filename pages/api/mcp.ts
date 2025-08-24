@@ -22,6 +22,12 @@ let currentLogLevel: LogLevel = 'info'
 
 // Helper function to handle JSON-RPC messages
 async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMessage> {
+  // COMPREHENSIVE DEBUGGING - Log ALL incoming methods
+  console.log(`\n[DEBUG] ========== MCP Request ==========`)
+  console.log(`[DEBUG] Method: ${message.method}`)
+  console.log(`[DEBUG] ID: ${message.id}`)
+  console.log(`[DEBUG] Params:`, JSON.stringify(message.params, null, 2))
+  
   // Handle different MCP protocol methods
   if (message.method === 'initialize') {
     return {
@@ -128,12 +134,17 @@ async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMes
       }
     }
   } else {
+    // Log unhandled methods to identify what Claude Desktop is calling
+    console.log(`[ERROR] Unhandled method: ${message.method}`)
+    console.log(`[ERROR] This method needs to be implemented!`)
+    console.log(`[ERROR] Full unhandled message:`, JSON.stringify(message, null, 2))
+    
     return {
       jsonrpc: '2.0',
       id: message.id,
       error: {
         code: -32601,
-        message: 'Method not found'
+        message: `Method not found: ${message.method}`
       }
     }
   }
