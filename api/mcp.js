@@ -1,5 +1,8 @@
 import { askAnsari, DEFAULT_ANSARI_API_URL } from '../dist/ansari-service.js';
 
+// Current logging level (can be 'debug', 'info', 'warning', 'error')
+let currentLogLevel = 'info';
+
 // Helper function to handle JSON-RPC messages
 async function handleJsonRpcMessage(message) {
   // Handle different MCP protocol methods
@@ -10,8 +13,8 @@ async function handleJsonRpcMessage(message) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: {
-          tools: {}
-          // Removed logging capability since we don't need it for this simple server
+          tools: {},
+          logging: {}  // Server supports logging capability
         },
         serverInfo: {
           name: 'Ansari',
@@ -21,6 +24,12 @@ async function handleJsonRpcMessage(message) {
     };
   } else if (message.method === 'logging/setLevel') {
     // Handle logging level changes
+    // The client can set the logging level to control what messages are sent
+    const { level } = message.params || {};
+    if (level && ['debug', 'info', 'warning', 'error'].includes(level)) {
+      currentLogLevel = level;
+      console.log(`Logging level set to: ${level}`);
+    }
     return {
       jsonrpc: '2.0',
       id: message.id,
@@ -52,7 +61,18 @@ async function handleJsonRpcMessage(message) {
     
     if (name === 'answer_islamic_question') {
       try {
+        // Log at debug level
+        if (currentLogLevel === 'debug') {
+          console.log(`[DEBUG] Calling Ansari API with question: ${args.question}`);
+        }
+        
         const response = await askAnsari(args.question, DEFAULT_ANSARI_API_URL);
+        
+        // Log at info level
+        if (['debug', 'info'].includes(currentLogLevel)) {
+          console.log(`[INFO] Successfully received response from Ansari API`);
+        }
+        
         return {
           jsonrpc: '2.0',
           id: message.id,
@@ -66,6 +86,11 @@ async function handleJsonRpcMessage(message) {
           }
         };
       } catch (error) {
+        // Log at error level
+        if (['debug', 'info', 'warning', 'error'].includes(currentLogLevel)) {
+          console.error(`[ERROR] Failed to call Ansari API:`, error.message);
+        }
+        
         return {
           jsonrpc: '2.0',
           id: message.id,
@@ -128,13 +153,17 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const message = req.body;
       
-      // Log the incoming request for debugging
-      console.log('Received MCP request:', JSON.stringify(message));
+      // Log at debug level
+      if (currentLogLevel === 'debug') {
+        console.log('[DEBUG] Received MCP request:', JSON.stringify(message));
+      }
       
       const response = await handleJsonRpcMessage(message);
       
-      // Log the outgoing response for debugging
-      console.log('Sending MCP response:', JSON.stringify(response));
+      // Log at debug level
+      if (currentLogLevel === 'debug') {
+        console.log('[DEBUG] Sending MCP response:', JSON.stringify(response));
+      }
       
       res.status(200).json(response);
       return;
