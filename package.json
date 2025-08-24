@@ -10,7 +10,8 @@
     "start:stdio": "node dist/server.js",
     "dev": "npx fastmcp dev src/server.ts",
     "inspect": "npx fastmcp inspect src/server.ts",
-    "test-direct": "tsx src/server.ts"
+    "test-direct": "tsx src/server.ts",
+    "vercel-build": "npm run build"
   },
   "keywords": [],
   "author": "",
