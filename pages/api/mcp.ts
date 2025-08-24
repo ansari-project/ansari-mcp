@@ -37,7 +37,9 @@ async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMes
         protocolVersion: '2024-11-05',
         capabilities: {
           tools: {},
-          logging: {}  // Server supports logging capability
+          resources: {},
+          prompts: {},
+          logging: {}
         },
         serverInfo: {
           name: 'Ansari',
