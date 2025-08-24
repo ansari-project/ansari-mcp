@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { askAnsari, DEFAULT_ANSARI_API_URL } from '../src/ansari-service'
+import { askAnsari, DEFAULT_ANSARI_API_URL } from '../dist/ansari-service.js'
 
 // Types for MCP protocol
 interface JsonRpcMessage {
