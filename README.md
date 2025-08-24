@@ -1,14 +1,94 @@
 # Ansari MCP Server
 
-An MCP (Model Context Protocol) server that provides Islamic knowledge through the Ansari API. This server allows Claude Desktop, Claude Code, and other MCP clients to answer Islamic questions with authentic sources from the Quran and Hadith.
+An MCP (Model Context Protocol) server that provides Islamic knowledge through the Ansari API. This server allows Claude Desktop, Claude Code, Cursor, and other MCP clients to answer Islamic questions with authentic sources from the Quran and Hadith.
 
-## Prerequisites
+## Hosted Server
+
+The Ansari MCP server is available as a hosted service at:
+```
+https://mcp.ansari.chat/mcp
+```
+
+You can use this URL directly in Claude Code or with adapters for Claude Desktop and Cursor (see setup instructions below).
+
+## Quick Start - Using the Hosted Server
+
+The easiest way to use Ansari MCP is through our hosted server. No installation required!
+
+### Claude Desktop
+
+1. Open Claude Desktop settings:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+2. Add this configuration:
+```json
+{
+  "mcpServers": {
+    "ansari": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.ansari.chat/mcp"
+      ]
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop completely (Cmd+Q / Alt+F4 and reopen)
+
+### Claude Code
+
+1. Open your project in Claude Code
+2. Add to your `.claude.json` or global configuration:
+```json
+{
+  "mcpServers": {
+    "ansari": {
+      "type": "http",
+      "url": "https://mcp.ansari.chat/mcp"
+    }
+  }
+}
+```
+
+### Visual Studio Code (with MCP Extension)
+
+If you have an MCP extension installed in VS Code:
+
+1. Open Command Palette (Cmd+Shift+P / Ctrl+Shift+P)
+2. Run "MCP: Add Server..."
+3. Select "HTTP (HTTP or Server-Sent Events)"
+4. Enter URL: `https://mcp.ansari.chat/mcp`
+5. Name it: "Ansari"
+
+### Cursor
+
+Cursor supports HTTP MCP servers directly:
+
+```json
+{
+  "mcpServers": {
+    "ansari": {
+      "type": "http",
+      "url": "https://mcp.ansari.chat/mcp"
+    }
+  }
+}
+```
+
+## Local Installation (Optional)
+
+If you prefer to run the server locally:
+
+### Prerequisites
 
 - Node.js (v18 or higher)
 - npm
-- Claude Desktop or Claude Code for MCP integration
 
-## Installation
+### Installation Steps
 
 1. Clone the repository:
 ```bash
@@ -71,23 +151,11 @@ npm start -- --http
 
 The server will be available at: `http://localhost:8089/mcp`
 
-## Claude Desktop Integration
+## Local Server Configuration
 
-### 1. Locate your configuration file
+If you're running the server locally instead of using the hosted version:
 
-#### macOS
-```
-~/Library/Application Support/Claude/claude_desktop_config.json
-```
-
-#### Windows
-```
-%APPDATA%\Claude\claude_desktop_config.json
-```
-
-### 2. Add the Ansari server configuration
-
-Edit the configuration file and add:
+### Claude Desktop (Local)
 
 ```json
 {
@@ -101,37 +169,7 @@ Edit the configuration file and add:
 }
 ```
 
-**Important**: Replace `/absolute/path/to/ansari-mcp` with the actual absolute path to your installation.
-
-### 3. Custom API URL (optional)
-
-To use a custom API endpoint:
-
-```json
-{
-  "mcpServers": {
-    "ansari": {
-      "command": "node",
-      "args": [
-        "/absolute/path/to/ansari-mcp/dist/server.js",
-        "--api-url",
-        "https://your-custom-api.com/endpoint"
-      ],
-      "env": {}
-    }
-  }
-}
-```
-
-### 4. Restart Claude Desktop
-
-After saving the configuration, completely restart Claude Desktop for changes to take effect.
-
-## Claude Code Integration
-
-### Option 1: Global Configuration
-
-Add to your Claude Code settings (usually in `~/.claude/claude_code_config.json`):
+### Claude Code (Local)
 
 ```json
 {
@@ -145,21 +183,21 @@ Add to your Claude Code settings (usually in `~/.claude/claude_code_config.json`
 }
 ```
 
-### Option 2: Project-specific Configuration
-
-Create `.claude-code.json` in your project root:
+### Cursor (Local)
 
 ```json
 {
   "mcpServers": {
     "ansari": {
       "command": "node",
-      "args": ["./path/to/ansari-mcp/dist/server.js"],
+      "args": ["/absolute/path/to/ansari-mcp/dist/server.js"],
       "env": {}
     }
   }
 }
 ```
+
+**Note**: Replace `/absolute/path/to/ansari-mcp` with your actual installation path.
 
 ## Usage
 
