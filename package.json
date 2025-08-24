@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "tsc && next build",
+    "build": "next build",
+    "type-check": "tsc --noEmit",
     "start": "next start",
     "lint": "next lint",
     "build:mcp": "tsc",

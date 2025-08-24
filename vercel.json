@@ -1,8 +1,8 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "/mcp",
-      "dest": "/api/mcp"
+      "source": "/mcp",
+      "destination": "/api/mcp"
     }
   ]
 }
