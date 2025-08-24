@@ -1,4 +1,6 @@
-export default function Home() {
+import { NextPage } from 'next'
+
+const Home: NextPage = () => {
   return (
     <div style={{ padding: '40px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <h1>Ansari MCP Server</h1>
@@ -24,3 +26,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home

@@ -1,10 +1,27 @@
-import { askAnsari, DEFAULT_ANSARI_API_URL } from '../dist/ansari-service.js';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { askAnsari, DEFAULT_ANSARI_API_URL } from '../../dist/ansari-service.js'
 
-// Current logging level (can be 'debug', 'info', 'warning', 'error')
-let currentLogLevel = 'info';
+// Types for MCP protocol
+interface JsonRpcMessage {
+  jsonrpc: '2.0'
+  id: number
+  method?: string
+  params?: any
+  result?: any
+  error?: {
+    code: number
+    message: string
+    data?: any
+  }
+}
+
+type LogLevel = 'debug' | 'info' | 'warning' | 'error'
+
+// Current logging level
+let currentLogLevel: LogLevel = 'info'
 
 // Helper function to handle JSON-RPC messages
-async function handleJsonRpcMessage(message) {
+async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMessage> {
   // Handle different MCP protocol methods
   if (message.method === 'initialize') {
     return {
@@ -21,20 +38,19 @@ async function handleJsonRpcMessage(message) {
           version: '1.0.0'
         }
       }
-    };
+    }
   } else if (message.method === 'logging/setLevel') {
     // Handle logging level changes
-    // The client can set the logging level to control what messages are sent
-    const { level } = message.params || {};
+    const { level } = message.params || {}
     if (level && ['debug', 'info', 'warning', 'error'].includes(level)) {
-      currentLogLevel = level;
-      console.log(`Logging level set to: ${level}`);
+      currentLogLevel = level as LogLevel
+      console.log(`Logging level set to: ${level}`)
     }
     return {
       jsonrpc: '2.0',
       id: message.id,
       result: {}
-    };
+    }
   } else if (message.method === 'tools/list') {
     return {
       jsonrpc: '2.0',
@@ -55,22 +71,22 @@ async function handleJsonRpcMessage(message) {
           }
         }]
       }
-    };
+    }
   } else if (message.method === 'tools/call') {
-    const { name, arguments: args } = message.params;
+    const { name, arguments: args } = message.params
     
     if (name === 'answer_islamic_question') {
       try {
         // Log at debug level
         if (currentLogLevel === 'debug') {
-          console.log(`[DEBUG] Calling Ansari API with question: ${args.question}`);
+          console.log(`[DEBUG] Calling Ansari API with question: ${args.question}`)
         }
         
-        const response = await askAnsari(args.question, DEFAULT_ANSARI_API_URL);
+        const response = await askAnsari(args.question, DEFAULT_ANSARI_API_URL)
         
         // Log at info level
         if (['debug', 'info'].includes(currentLogLevel)) {
-          console.log(`[INFO] Successfully received response from Ansari API`);
+          console.log(`[INFO] Successfully received response from Ansari API`)
         }
         
         return {
@@ -84,11 +100,11 @@ async function handleJsonRpcMessage(message) {
               }
             ]
           }
-        };
+        }
       } catch (error) {
         // Log at error level
         if (['debug', 'info', 'warning', 'error'].includes(currentLogLevel)) {
-          console.error(`[ERROR] Failed to call Ansari API:`, error.message);
+          console.error(`[ERROR] Failed to call Ansari API:`, (error as Error).message)
         }
         
         return {
@@ -97,9 +113,9 @@ async function handleJsonRpcMessage(message) {
           error: {
             code: -32603,
             message: 'Internal error',
-            data: error.message
+            data: (error as Error).message
           }
-        };
+        }
       }
     } else {
       return {
@@ -109,7 +125,7 @@ async function handleJsonRpcMessage(message) {
           code: -32601,
           message: 'Method not found'
         }
-      };
+      }
     }
   } else {
     return {
@@ -119,22 +135,25 @@ async function handleJsonRpcMessage(message) {
         code: -32601,
         message: 'Method not found'
       }
-    };
+    }
   }
 }
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   // Set comprehensive CORS headers
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Expose-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Max-Age', '86400');
+  const origin = req.headers.origin || '*'
+  res.setHeader('Access-Control-Allow-Origin', origin)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With')
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Max-Age', '86400')
 
   if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
+    res.status(204).end()
+    return
   }
 
   try {
@@ -145,33 +164,33 @@ export default async function handler(req, res) {
         version: "1.0.0",
         status: "ready",
         endpoint: "/mcp"
-      });
-      return;
+      })
+      return
     }
 
     // For POST requests, handle MCP protocol messages
     if (req.method === 'POST') {
-      const message = req.body;
+      const message = req.body as JsonRpcMessage
       
       // Log at debug level
       if (currentLogLevel === 'debug') {
-        console.log('[DEBUG] Received MCP request:', JSON.stringify(message));
+        console.log('[DEBUG] Received MCP request:', JSON.stringify(message))
       }
       
-      const response = await handleJsonRpcMessage(message);
+      const response = await handleJsonRpcMessage(message)
       
       // Log at debug level
       if (currentLogLevel === 'debug') {
-        console.log('[DEBUG] Sending MCP response:', JSON.stringify(response));
+        console.log('[DEBUG] Sending MCP response:', JSON.stringify(response))
       }
       
-      res.status(200).json(response);
-      return;
+      res.status(200).json(response)
+      return
     }
     
-    res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' })
   } catch (error) {
-    console.error('MCP Server Error:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    console.error('MCP Server Error:', error)
+    res.status(500).json({ error: 'Internal server error', details: (error as Error).message })
   }
 }
