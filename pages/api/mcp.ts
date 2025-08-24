@@ -179,6 +179,10 @@ export default async function handler(
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With')
   res.setHeader('Access-Control-Expose-Headers', 'Content-Type')
   res.setHeader('Access-Control-Max-Age', '86400')
+  
+  // Keep connection alive for MCP
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('Keep-Alive', 'timeout=60')
 
   if (req.method === 'OPTIONS') {
     res.status(204).end()
