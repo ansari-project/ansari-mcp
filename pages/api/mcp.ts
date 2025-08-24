@@ -188,6 +188,14 @@ export default async function handler(
         console.log('[DEBUG] Received MCP request:', JSON.stringify(message))
       }
       
+      // Check if this is a notification (no id field means it's a notification)
+      if (!message.id && message.method?.startsWith('notifications/')) {
+        console.log(`[INFO] Received notification: ${message.method}`)
+        // Notifications don't require a response
+        res.status(204).end()
+        return
+      }
+      
       const response = await handleJsonRpcMessage(message)
       
       // Log at debug level
