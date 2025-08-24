@@ -82,7 +82,7 @@ async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMes
         tools: [{
           name: 'answer_islamic_question',
           description: 'Answer Islamic question',
-          input_schema: {
+          inputSchema: {
             type: 'object',
             properties: {
               question: {
