@@ -24,9 +24,11 @@ let currentLogLevel: LogLevel = 'info'
 async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMessage> {
   // COMPREHENSIVE DEBUGGING - Log ALL incoming methods
   console.log(`\n[DEBUG] ========== MCP Request ==========`)
+  console.log(`[DEBUG] Timestamp: ${new Date().toISOString()}`)
   console.log(`[DEBUG] Method: ${message.method}`)
   console.log(`[DEBUG] ID: ${message.id}`)
   console.log(`[DEBUG] Params:`, JSON.stringify(message.params, null, 2))
+  console.log(`[DEBUG] Full message:`, JSON.stringify(message, null, 2))
   
   // Handle different MCP protocol methods
   if (message.method === 'initialize') {
@@ -206,6 +208,9 @@ export default async function handler(
 
     // For POST requests, handle MCP protocol messages
     if (req.method === 'POST') {
+      console.log(`[DEBUG] Received POST at ${new Date().toISOString()}`)
+      console.log(`[DEBUG] Headers:`, JSON.stringify(req.headers))
+      
       const message = req.body as JsonRpcMessage
       
       // Log at debug level
