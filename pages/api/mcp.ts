@@ -196,12 +196,18 @@ export default async function handler(
   try {
     // For GET requests, return server info
     if (req.method === 'GET') {
+      // Check if this is an SSE request
+      const acceptHeader = req.headers.accept || ''
+      
+      // Return MCP server info
       res.status(200).json({
         name: "Ansari",
         version: "1.0.0",
         status: "ready",
         endpoint: "/mcp",
-        lastUpdated: "2025-08-24T09:45:00Z"
+        transport: "streamable-http",
+        authentication: "none",
+        lastUpdated: "2025-08-24T10:30:00Z"
       })
       return
     }
