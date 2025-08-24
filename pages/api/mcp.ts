@@ -57,6 +57,24 @@ async function handleJsonRpcMessage(message: JsonRpcMessage): Promise<JsonRpcMes
       id: message.id,
       result: {}
     }
+  } else if (message.method === 'resources/list') {
+    // Return empty resources list (we don't provide resources)
+    return {
+      jsonrpc: '2.0',
+      id: message.id,
+      result: {
+        resources: []
+      }
+    }
+  } else if (message.method === 'prompts/list') {
+    // Return empty prompts list (we don't provide prompts)
+    return {
+      jsonrpc: '2.0',
+      id: message.id,
+      result: {
+        prompts: []
+      }
+    }
   } else if (message.method === 'tools/list') {
     return {
       jsonrpc: '2.0',
