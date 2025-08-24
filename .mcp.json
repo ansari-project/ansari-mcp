@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ansari": {
+      "type": "http",
+      "url": "https://mcp.ansari.chat/mcp"
+    }
+  }
+}
