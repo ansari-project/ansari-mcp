@@ -1,36 +1,4 @@
-import { FastMCP } from "fastmcp";
-import { z } from "zod";
 import { askAnsari, DEFAULT_ANSARI_API_URL } from '../dist/ansari-service.js';
-
-const server = new FastMCP({
-  name: "Ansari",
-  version: "1.0.0",
-});
-
-server.addTool({
-  annotations: {
-    openWorldHint: true,
-    readOnlyHint: true,
-    title: "Answer Islamic Question",
-  },
-  name: "answer_islamic_question",
-  description: "Answer Islamic question",
-  parameters: z.object({
-    question: z.string().describe("The islamic question")
-  }),
-  execute: async (args, { log, reportProgress }) => {
-    log.info("Question: ", args.question);
-
-    await reportProgress({ progress: 0, total: 100 });
-
-    const response = await askAnsari(args.question, DEFAULT_ANSARI_API_URL);
-
-    await reportProgress({ progress: 100, total: 100 });
-
-    log.info("Ansari :", response);
-    return response;
-  },
-});
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -43,36 +11,114 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Create a custom request/response handler for Vercel
-  const mockReq = {
-    method: req.method,
-    headers: req.headers,
-    body: req.body
-  };
+  try {
+    // For GET requests, return server info
+    if (req.method === 'GET') {
+      res.status(200).json({
+        name: "Ansari",
+        version: "1.0.0",
+        status: "ready",
+        endpoint: "/mcp"
+      });
+      return;
+    }
 
-  const mockRes = {
-    writeHead: (statusCode, headers) => {
-      res.status(statusCode);
-      if (headers) {
-        Object.entries(headers).forEach(([key, value]) => {
-          res.setHeader(key, value);
+    // For POST requests, handle MCP protocol messages
+    if (req.method === 'POST') {
+      const message = req.body;
+      
+      // Handle different MCP protocol methods
+      if (message.method === 'initialize') {
+        res.status(200).json({
+          jsonrpc: '2.0',
+          id: message.id,
+          result: {
+            protocolVersion: '2024-11-05',
+            capabilities: {
+              tools: {},
+              logging: {}
+            },
+            serverInfo: {
+              name: 'Ansari',
+              version: '1.0.0'
+            }
+          }
+        });
+      } else if (message.method === 'tools/list') {
+        res.status(200).json({
+          jsonrpc: '2.0',
+          id: message.id,
+          result: {
+            tools: [{
+              name: 'answer_islamic_question',
+              description: 'Answer Islamic question',
+              inputSchema: {
+                type: 'object',
+                properties: {
+                  question: {
+                    type: 'string',
+                    description: 'The islamic question'
+                  }
+                },
+                required: ['question']
+              }
+            }]
+          }
+        });
+      } else if (message.method === 'tools/call') {
+        const { name, arguments: args } = message.params;
+        
+        if (name === 'answer_islamic_question') {
+          try {
+            const response = await askAnsari(args.question, DEFAULT_ANSARI_API_URL);
+            res.status(200).json({
+              jsonrpc: '2.0',
+              id: message.id,
+              result: {
+                content: [
+                  {
+                    type: 'text',
+                    text: response
+                  }
+                ]
+              }
+            });
+          } catch (error) {
+            res.status(200).json({
+              jsonrpc: '2.0',
+              id: message.id,
+              error: {
+                code: -32603,
+                message: 'Internal error',
+                data: error.message
+              }
+            });
+          }
+        } else {
+          res.status(200).json({
+            jsonrpc: '2.0',
+            id: message.id,
+            error: {
+              code: -32601,
+              message: 'Method not found'
+            }
+          });
+        }
+      } else {
+        res.status(200).json({
+          jsonrpc: '2.0',
+          id: message.id,
+          error: {
+            code: -32601,
+            message: 'Method not found'
+          }
         });
       }
-    },
-    write: (chunk) => {
-      res.write(chunk);
-    },
-    end: (chunk) => {
-      if (chunk) res.write(chunk);
-      res.end();
+    } else {
+      res.status(405).json({ error: 'Method not allowed' });
     }
-  };
-
-  // Use FastMCP's HTTP handler
-  try {
-    await server.handleHTTP(mockReq, mockRes);
   } catch (error) {
     console.error('MCP Server Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
