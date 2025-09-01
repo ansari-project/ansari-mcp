@@ -18,13 +18,13 @@ The easiest way to use Ansari MCP is through our hosted server. No installation 
 ### Claude Desktop
 
 1. Open Claude Desktop and click on your profile/name in the bottom left corner
-   ![Claude Settings Menu](docs/images/settings.png)
+   ![Claude Settings Menu](docs/images/settings-small.png)
 
 2. Select "Settings" from the menu
-   ![Claude Settings](docs/images/settings2.png)
+   ![Claude Settings](docs/images/settings2-small.png)
 
 3. Navigate to "Developer" tab and click "Edit Config"
-   ![Edit Config Button](docs/images/settings3.png)
+   ![Edit Config Button](docs/images/settings3-small.png)
 
 4. This will open the `claude_desktop_config.json` file in your default text editor
    - **macOS**: Located at `~/Library/Application Support/Claude/claude_desktop_config.json`
