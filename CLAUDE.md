@@ -63,15 +63,23 @@ Claude Desktop requires the `mcp-remote` adapter to connect to HTTP servers.
 
 ### Claude Code
 
-Claude Code has native support for HTTP MCP servers.
-
-#### Configuration Location
-- Project-specific: `.claude.json` in your project root
-- Global: `~/.claude.json`
+Claude Code has native support for HTTP MCP servers with a simple CLI command.
 
 #### Using Hosted Server (Recommended)
 
-Add to your configuration:
+Simply run this command in your terminal:
+```bash
+claude mcp add ansari -t http https://mcp.ansari.chat/mcp
+```
+
+This will automatically configure the Ansari server in your Claude Code settings.
+
+#### Manual Configuration (Alternative)
+
+If you prefer manual configuration, you can edit:
+- Project-specific: `.claude.json` in your project root
+- Global: `~/.claude.json`
+
 ```json
 {
   "mcpServers": {
