@@ -26,6 +26,19 @@ Claude Desktop requires the `mcp-remote` adapter to connect to HTTP servers.
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
+#### How to Access Configuration
+
+1. Open Claude Desktop and click on your profile/name in the bottom left corner
+   ![Claude Settings Menu](docs/images/settings.png)
+
+2. Select "Settings" from the menu
+   ![Claude Settings](docs/images/settings2.png)
+
+3. Navigate to "Developer" tab and click "Edit Config"
+   ![Edit Config Button](docs/images/settings3.png)
+
+4. This will open the `claude_desktop_config.json` file in your default text editor
+
 #### Using Hosted Server (Recommended)
 
 1. Edit your `claude_desktop_config.json`:
