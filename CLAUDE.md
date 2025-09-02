@@ -213,6 +213,19 @@ If you get `npx: command not found`:
 1. Install Node.js (v18 or higher): https://nodejs.org/
 2. Verify installation: `node --version` and `npx --version`
 
+## Claude Code Status Line Task Management
+
+### Using `slt:` Commands
+
+In Claude Code, you can quickly set status line tasks by typing:
+
+- `slt: Your task here` - Sets the task in your status line
+- `slt:` - Clears the current task
+
+The task will appear in your Claude Code status line for easy reference.
+
+**Note**: This is a project-specific feature that works when Claude recognizes the `slt:` prefix in your messages.
+
 ## Technical Details
 
 ### Protocol
