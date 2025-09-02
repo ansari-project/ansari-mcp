@@ -30,9 +30,9 @@ server.addTool({
     title: "Answer Islamic Question",
   },
   name: "answer_islamic_question",
-  description: "Answer Islamic question",
+  description: "Answers questions about Islam including theology, jurisprudence (fiqh), history, Quranic interpretation (tafsir), Hadith sciences, Islamic law, worship practices, ethics, spirituality, and contemporary issues. Provides comprehensive answers with citations from Quran, authentic Hadith, and classical Islamic scholarship. Can handle questions about specific verses, hadiths, scholarly opinions, historical events, prophets, companions, and modern applications of Islamic principles.",
   parameters: z.object({
-    question: z.string().describe("The islamic question")
+    question: z.string().describe("The question about Islam to be answered. Include as much context and detail as possible. You can ask about specific Quranic verses, hadiths, Islamic rulings, historical events, theological concepts, or practical applications. The more context provided, the more comprehensive and relevant the answer will be.")
   }),
   execute: async (args, { log, reportProgress }) => {
     log.info("Question: ", args.question);
